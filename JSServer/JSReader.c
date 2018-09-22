@@ -1,35 +1,33 @@
 /*///////////////////////////////////
-/// Joystick Reader v0.9, bld 15  ///
+/// Joystick Reader v2.0, bld 1  ///
 /// Vítor Rodrigues, Student@UFPB ///
-/// ☼ 20-Aug-2018, ☾ 29-Aug-2018 ///
+/// ☼ 22-Sep-2018, ☾ 22-Sep-2018 ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Joystick Reader v0.9.15"
+#define gmsg "Welcome to DualShock Joystick Reader v2.0.1"
 
 //Libraries Included
 #include <stdio.h>		//Standard Library. For usage of Input/Output Buffers.
 #include <stdlib.h>		//Extended variable and function definitions.
 #include <string.h>		//String-based Operations Library.
 #include <unistd.h>		//A Basic Library for IPC Applications.
+#include <pthread.h>		//Basic thread library
+#include <poll.h>		//Definitions for the poll() function
 #include <fcntl.h>		//Defines open() function (used in pair with unistd).
-#include <sys/stat.h>	//Defines data returned by the stat() function.
+#include <sys/stat.h>		//Defines data returned by the stat() function.
 #include <errno.h>		//Defines errno (system error value) symbol.
-#include <asm/types.h>	//Memory-based variable types definitions.
+#include <asm/types.h>		//Memory-based variable types definitions.
 #include <math.h>		//Extension Library for Math operations
-
-#include <ctype.h>
-#include <sys/socket.h>
-#include "create_socket.h"
+#include <ctype.h>		//Assembly Type Definitions
+#include <sys/socket.h>		//Socket Library
+#include "create_socket.h"	//Defines create_socket() function
 
 //Server IP is his own IP
-#define Server_IP "127.0.0.1" //(LOCAL)
-//#define Server_IP "192.168.6.2" //(FALSE BB IP)
-//#define Server_IP "another IP"
-//#define Server_IP "177.180.228.135"
+//#define Server_IP "127.0.0.1" //(LOCAL)
+#define Server_IP "150.165.164.116"
 
 //PWM Dividing Factor (Stick values go from 0 to 32767)
 #define PDIV 129	//Stick values divided by this go from 0 to 254
-//#define PDIV 328	//Stick values divided by this go from 0 to 100 (using ceil)
 
 //Joystick Definition for Inputs (Use only ONE at a time)
 #include "js_multilaser.h"
@@ -48,7 +46,7 @@ char s[]=""; //Temporary string just to print names on screen
 
 int main(int argc, char *argv[])
 {
-    //Here we define the struct format for the JS input event
+	//Here we define the struct format for the JS input event
 	struct js_event {
 		__u32 time;     // event timestamp in milliseconds 
 		__s16 value;    // value 
@@ -58,12 +56,25 @@ int main(int argc, char *argv[])
 
 	//Here we create the variable e with the js_event format
 	struct js_event e;
+	
+	//Here we define the struct format for the JS sending data
+	struct js_data {
+		int left=0;	//Left PWM Value (0 to 254)
+		int right=0;	//Right PWM Value (0 to 254)
+		int logic = 0;  //Logic Storage Variable (based on lsign and rsign values)
+		int lsign=0;
+		int rsign=0; //Left and Right Sign Vectors (Can be 1, 0 or -1)
+		char rsignus=' ';
+		char lsignus=' '; //Ascii Sign Characters for Left and Right PWM ('+' or '-')
+	};
+	
+	//Here we create the variable tank with the js_data format
+	struct js_data tank;
 
 	//Socket Variables
 	int server = -1;
 	int client = -1;
 	int sent = -1;
-	char *sport = Server_IP;
 	int label = 0;
 	
 	//Joystick Variables
@@ -74,17 +85,11 @@ int main(int argc, char *argv[])
 	int hold1=0, hold2=0; //Temp Boolean Values for key combinations
 	int mode=500;	//Temp Boolean Value for operation mode
 	char key = 0; //Temp Variable just for reading Key pressing
+	int buffer[3]={0,0,0}; //Array to store payloads to be sent
 
 	//Current Value Variables
 	int sign=0;	//Stores Sign Vector for the current event (Can be 1, 0 or -1)
 	int val=0;	//Stores Absolute Value for the current event
-
-	//Potential Outputs
-	int lpwm=0, rpwm=0; //Left and Right PWM Values (0 to 254)
-	int logic = 0;  //Logic Storage Variable (based on lsign and rsign values)
-	int buffer[3]={0,0,0}; //Array to store payloads to be sent
-	int lsign=0, rsign=0; //Left and Right Sign Vectors (Can be 1, 0 or -1)
-	char rsignus=' ', lsignus=' '; //Ascii Sign Characters for Left and Right PWM ('+' or '-')
 	
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
@@ -95,7 +100,7 @@ int main(int argc, char *argv[])
 	printf("Press Enter to connect with your Device...");
 	while (key != '\r' && key != '\n') { key = getchar(); }
 	key = 0;
-	
+
 	//Open Joystick Port, Read-Only Mode
 	printf("Connecting with your device...");
 	fd = open ("/dev/input/js0", O_RDONLY);
@@ -117,7 +122,7 @@ int main(int argc, char *argv[])
 	// Creates a server socket and terminate on error
 	server = create_socket(1, Server_IP);
 	if (server == -1) { return 1; }
-	
+		/*
 	// Listener loop
 	while (1) {
 		printf("Ready for clients...\n");
