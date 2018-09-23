@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	
 	//Here we define the struct format for the JS sending data
 	struct js_data {
-		int left=0;	//Left PWM Value (0 to 254)
+		int left;	//Left PWM Value (0 to 254)
 		int right=0;	//Right PWM Value (0 to 254)
 		int logic = 0;  //Logic Storage Variable (based on lsign and rsign values)
 		int lsign=0;
