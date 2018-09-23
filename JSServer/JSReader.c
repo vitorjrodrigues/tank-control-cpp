@@ -1,5 +1,5 @@
 /*///////////////////////////////////
-/// Joystick Reader v1.9, bld 1  ///
+/// Joystick Reader v1.9, bld 2  ///
 /// Vítor Rodrigues, Student@UFPB ///
 /// ☼ 22-Sep-2018, ☾ 22-Sep-2018 ///
 ///////////////////////////////////*/
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 	// Creates a server socket and terminate on error
 	server = create_socket(1, Server_IP);
 	if (server == -1) { return 1; }
-		/*
+		
 	// Listener loop
 	while (1) {
 		printf("Ready for clients...\n");
