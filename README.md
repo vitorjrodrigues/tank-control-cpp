@@ -16,7 +16,7 @@
 
 ## How to Install
 
-#### Step 1
+#### Step 1 - Downloading
 - Clone the repository via terminal:
 ```
 $>  git clone https://github.com/vitorjrodrigues/tank-control.git
@@ -24,4 +24,16 @@ $>  git clone https://github.com/vitorjrodrigues/tank-control.git
 or
 - Download the directory as .zip and extract it wherever
 
-#### Step 2
+#### Step 2 - Configuring Client
+- Open your Beaglebone via Browser:
+  - 192.168.7.2 for Windows Users
+  - 192.168.6.2 for Linux Users
+- Open up the Cloud9 IDE
+- Drag 'SockClient' folder to your Beaglebone's main folder
+- To compile everything, type on your cloud9 terminal:
+```
+$> cd /var/lib/cloud9/SockClient 
+$> make
+```
+
+#### Step 3 - Configuring Joystick
