@@ -50,6 +50,25 @@ $> make
   - R- on P8_13 
 - Connect your Beaglebone Black to your network source (Cable or Antenna)
 - Connect your power supply (not needed if connected on USB cable)
+
+#### Step 5 - Executing Programs
+- On your Computer Terminal, execute the server:
+```
+$> ./JSReader
+```
+- Follow the instructions on the screen until the server connects
+- After the server is on, go to your Beaglebone's Cloud9 Terminal and execute the client:
+```
+$> ./Client
+```
+- Follow the instructions until the client connects.
+- Server will tell whenever it's ready to start transmitting
+
+### Step 6 - Sending Commands
+- With your Joystick in hands, enter _Controller Mode_
+- Use Left and Right Analog Sticks to control the tank
+  - Sticks can only send up and down values, meaning forwards and backwards to their respective motors
+  
 ## Change log
 
 ###### 23-Set-2018 09h42
