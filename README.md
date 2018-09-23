@@ -85,3 +85,8 @@ $> ./Client
 - Joystick Reader v1.9, bld 3
   - Key Pressing detection is now an independent function
   - PWM now goes from 0 to 32767 (Previously 0 to 254)
+
+###### 23-Set-2018 12h37
+- Joystick Reader v1.9, bld 4
+  - PWM now goes from -32767 to 32767 (Previously 0 to 32767)
+  - Output buffer now only contains 2 values (Logic values were discarded)
