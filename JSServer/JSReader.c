@@ -27,7 +27,7 @@
 #define Server_IP "150.165.164.116"
 
 //PWM Dividing Factor (Stick values go from 0 to 32767)
-#define PDIV 129	//Stick values divided by this go from 0 to 254
+//#define PDIV 129	//Stick values divided by this go from 0 to 254
 
 //Joystick Definition for Inputs (Use only ONE at a time)
 #include "js_multilaser.h"
