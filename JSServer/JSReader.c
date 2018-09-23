@@ -26,15 +26,9 @@
 //#define Server_IP "127.0.0.1" //(LOCAL)
 #define Server_IP "150.165.164.116"
 
-//PWM Dividing Factor (Stick values go from 0 to 32767)
-//#define PDIV 129	//Stick values divided by this go from 0 to 254
-
 //Joystick Definition for Inputs (Use only ONE at a time)
 #include "js_multilaser.h"
 //#include "js_dualshock1.h"
-
-//Function to convert event numbers in to their proper names
-void *number2name(int n, int t);
 
 //Creates a Logic Value based on PWM direction for each wheel
 int makeLogic(int leftInput, int rightInput);
@@ -51,44 +45,42 @@ int main(int argc, char *argv[])
 		__u8 type;      // event type 
 		__u8 number;    // axis/button number 
 	};
+	
+	//Here we define the struct format for the JS data
+	struct js_data {
+		int left;	//Left PWM Value (0 to 32767)
+		int right;	//Right PWM Value (0 to 32767)
+		int logic;  //Logic Storage Variable (based on lsign and rsign values)
+		int lsign;
+		int rsign; //Left and Right Sign Vectors (Can be 1, 0 or -1)
+		char rsignus;
+		char lsignus; //Ascii Sign Characters for Left and Right PWM ('+' or '-')
+		int fd; //Stores the File Descriptor value for the Joystick (His connection number)
+		ssize_t sz;
+		int output[3]; //Array to store payload to be sent
+	};
+
+	//Here we define the struct format for the Socket Server
+	struct socket {
+		int status;
+		int client;
+		int sent;
+		int label;
+	};
 
 	//Here we create the variable e with the js_event format
 	struct js_event e;
 	
-	//Here we define the struct format for the JS sending data
-	struct js_data {
-		int left;	//Left PWM Value (0 to 254)
-		int right=0;	//Right PWM Value (0 to 254)
-		int logic = 0;  //Logic Storage Variable (based on lsign and rsign values)
-		int lsign=0;
-		int rsign=0; //Left and Right Sign Vectors (Can be 1, 0 or -1)
-		char rsignus=' ';
-		char lsignus=' '; //Ascii Sign Characters for Left and Right PWM ('+' or '-')
-	};
-	
 	//Here we create the variable tank with the js_data format
 	struct js_data tank;
 
-	//Here we define the struct format for the Socket Server
-	struct socket {
-		int server = -1;
-		int client = -1;
-		int sent = -1;
-		int label = 0;
-	};
-
-	//Here we create the variable tank with the js_data format
-	struct socket serv;
-	
-	//Joystick Variables
-	int fd=0; //Stores the File Descriptor value for the Joystick (His connection number)
-	ssize_t sz = -1;
+	//Here we create the variable serv with the socket format
+	struct socket server;
 	
 	//Intermediate Variables
 	int hold1=0, hold2=0; //Temp Boolean Values for key combinations
 	int mode=500;	//Temp Boolean Value for operation mode
 	char key = 0; //Temp Variable just for reading Key pressing
-	int buffer[3]={0,0,0}; //Array to store payloads to be sent
 
 	//Current Value Variables
 	int sign=0;	//Stores Sign Vector for the current event (Can be 1, 0 or -1)
@@ -106,10 +98,10 @@ int main(int argc, char *argv[])
 
 	//Open Joystick Port, Read-Only Mode
 	printf("Connecting with your device...");
-	fd = open ("/dev/input/js0", O_RDONLY);
+	tank.fd = open ("/dev/input/js0", O_RDONLY);
 	
 	//Return Value of open() function shows if the connection has succeeded
-	if(fd<0) { //**************************************************************
+	if(tank.fd<0) { //**************************************************************
 		//Connection Failed. Report it on a Status Message
 		printf("Connection Failed!! :(\nPlease try again.\n");
 		return 1;
@@ -123,8 +115,8 @@ int main(int argc, char *argv[])
 	key = 0;
 	
 	// Creates a server socket and terminate on error
-	server = create_socket(1, Server_IP);
-	if (server == -1) { return 1; }
+	server.status = create_socket(1, Server_IP);
+	if (server.status == -1) { return 1; }
 		
 	// Listener loop
 	while (1) {
@@ -132,24 +124,21 @@ int main(int argc, char *argv[])
 		
 		// Wait for connections on the socket server.
 		// Each client gets a new private socket.
-		client = accept(server, 0, 0);
+		server.client = accept(server.status, 0, 0);
 		printf("Got a client!\nAll Ready!\n");
 		printf(">>>Press SELECT to Exit<<<\n>>>Press R1+△ to Turn ON/OFF the Vehicle<<<\n");
-		label = client - 3;
+		server.label = server.client - 3;
 		
 		// Client message loop:
 		while (1) { //If all goes well, the program should start HERE
 			
 			//read a value from the event
-			sz = read (fd, &e, sizeof(e));
+			tank.sz = read (tank.fd, &e, sizeof(e));
 			
 			//If value is an Initialization Value, ignore it.
 			if(e.type<T_INITIAL) { //*************************************************************
 				//Stores current absolute value
 				val = abs(e.value);
-				
-				//Get the proper identification of the input data
-				number2name(e.number,e.type);
 				
 				//Check if input is either an Axis value or a Button value
 				//Button values are unsigned booleans
@@ -184,40 +173,41 @@ int main(int argc, char *argv[])
 				
 				if(mode==0) { //Debug Mode
 					//Show all inputs read on screen but don't write any on socket
-					printf("\nValue = %c%u;\n%s;\nType = %x\n",(44-sign),val,s,e.type);
+					printf("\nValue = %c%u;\nType = %x\n",(44-sign),val,e.type);
 				}
 				else if (mode == 1){ //TC Mode //*******************************************************
 					//Ignore all inputs but LAS Y Axis and RAS Y Axis
 					if((e.type==T_STICK)&&((e.number==STK_YLEFT)||(e.number==STK_YRIGHT))) {
 						if(e.number==STK_YLEFT) { //If current value is LAS Y Axis, then Update all Left PWM Values 
-							lpwm = val/PDIV;
-							lsign = sign;
-							if(lsign!=0)	{ lsignus = 44 - lsign; }
-							else			{ lsignus = ' '; }
+							tank.left = val;
+							tank.lsign = sign;
+							if(tank.lsign!=0)	{ tank.lsignus = 44 - tank.lsign; }
+							else			{ tank.lsignus = ' '; }
 						}
 						else if(e.number==STK_YRIGHT) { //If current value is RAS Y Axis, then Update all Right PWM Values
-							rpwm = val/PDIV;
-							rsign = sign;
-							if(rsign!=0)	{ rsignus = 44 - rsign; }
-							else			{ rsignus = ' '; }
+							tank.right = val;
+							tank.rsign = sign;
+							if(tank.rsign!=0)	{ tank.rsignus = 44 - tank.rsign; }
+							else			{ tank.rsignus = ' '; }
 						}
 
 						//Creates a logic value corresponding each possible direction of movement
-						logic = makeLogic(lsign, rsign);
-						
+						tank.logic = makeLogic(tank.lsign, tank.rsign);
+
 						//Print Current PWM Values Stored
-						printf("\n||\tLPWM\t,\tRPWM\t||\n||\t%c%d\t,\t%c%d\t||\n",lsignus,lpwm,rsignus,rpwm);
+						printf("\n||\tLPWM\t,\tRPWM\t||");
+						printf("\n||\t%c%d\t,\t%c%d\t||\n", tank.lsignus,tank.left,tank.rsignus,tank.right);
 					}
 					
-					buffer[0] = logic;
-					buffer[1] = lpwm;
-					buffer[2] = rpwm;
+					tank.output[0] = tank.logic;
+					tank.output[1] = tank.left;
+					tank.output[2] = tank.right;
 					
 					//Now Transmit the values through the Socket
-					sent = write(client,  buffer , sizeof(buffer));
+					server.sent = write(server.client,  tank.output , sizeof(tank.output));
 					
-					if(sent == -1) {
-						printf("Client %d is lost!\n",label);
+					if(server.sent == -1) {
+						printf("Client %d is lost!\n",server.label);
 						break;
 					}
 				}	
@@ -226,8 +216,8 @@ int main(int argc, char *argv[])
 		}
 	
 		// Terminate the client connection.
-		printf("Closing Client %d Connection\n",label);
-		close(client);
+		printf("Closing Client %d Connection\n",server.label);
+		close(server.client);
 		
 		//If no client is connected, ask if the user want to end the server
 		printf("There are no more clients left, do you wish to exit server? (y/n) ");
@@ -238,39 +228,11 @@ int main(int argc, char *argv[])
 	}
 	
 	//Close Socket and then close Joystick Port
-	bigClosure(fd,server);
+	bigClosure(tank.fd,server.status);
 
 	//End of Program
 	printf("PROGRAM TERMINATED");
 	return 0;
-}
-
-void *number2name(int number, int type) {
-	strcpy(s,"");
-	if(type==T_BUTTON) {
-		if(number==BTN_TRIANGLE)		{ strcat(s,"△"); }
-		else if(number==BTN_CIRCLE)		{ strcat(s,"◯"); }
-		else if(number==BTN_X)			{ strcat(s,"✕"); }
-		else if(number==BTN_SQUARE)		{ strcat(s,"□"); }
-		else if(number==BTN_L1)			{ strcat(s,"L1"); }
-		else if(number==BTN_R1)			{ strcat(s,"R1"); }
-		else if(number==BTN_L2)			{ strcat(s,"L2"); }
-		else if(number==BTN_R2)			{ strcat(s,"R2"); }
-		else if(number==BTN_SELECT)		{ strcat(s,"Select"); }
-		else if(number==BTN_START)		{ strcat(s,"Start"); }
-		else if(number==BTN_L3)			{ strcat(s,"L3"); }
-		else if(number==BTN_R3)			{ strcat(s,"R3"); }
-		strcat(s," Button");
-	}
-	else if(type==T_STICK) {
-		if(number==STK_XLEFT)			{ strcat(s,"Left Stick X"); }
-		else if(number==STK_YLEFT)		{ strcat(s,"Left Stick Y"); }
-		else if(number==STK_XRIGHT)		{ strcat(s,"Right Stick X"); }
-		else if(number==STK_YRIGHT)		{ strcat(s,"Right Stick Y"); }
-		else if(number==STK_XDPAD)		{ strcat(s,"Dual Pad X"); }
-		else if(number==STK_YDPAD)		{ strcat(s,"Dual Pad Y"); }
-		strcat(s," Axis");
-	}
 }
 
 int makeLogic(int leftInput, int rightInput) {
