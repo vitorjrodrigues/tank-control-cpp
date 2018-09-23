@@ -91,7 +91,6 @@ void setupPWM() {
 }
 
 int startPWM(char *path) {
-	char *zero="0";
 	int fd = -1;
 	
 	fd = open(path, O_RDWR);
@@ -99,7 +98,7 @@ int startPWM(char *path) {
 		printf("Failed!\n");
 		exit(0);
 	}
-	int sent = write(fd, zero, sizeof(zero));
+	int sent = write(fd, "0", sizeof("0"));
 	return fd;
 }
 
@@ -119,14 +118,12 @@ void updatePWM(int la, int lb, int ra, int rb, int fd1a, int fd1b, int fd2a, int
 }
 
 void endPWM(int fd1a, int fd1b, int fd2a, int fd2b) {
-	int suc = -1;
-	char *zero="0";
-	write(fd1a, zero, sizeof(zero));
-	suc = close(fd1a);
-	write(fd1b, zero, sizeof(zero));
-	suc = close(fd1b);
-	write(fd2a, zero, sizeof(zero));
-	suc = close(fd2a);
-	write(fd2b, zero, sizeof(zero));
-	suc = close(fd2b);
+	write(fd1a, "0", sizeof("0"));
+	close(fd1a);
+	write(fd1b, "0", sizeof("0"));
+	close(fd1b);
+	write(fd2a, "0", sizeof("0"));
+	close(fd2a);
+	write(fd2b, "0", sizeof("0"));
+	close(fd2b);
 }
