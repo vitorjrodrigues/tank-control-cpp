@@ -13,12 +13,9 @@
 #include <fcntl.h>		//Defines open() function (used in pair with unistd).
 #include <sys/socket.h>		//Socket Library
 #include "create_socket.h"	//Defines create_socket() function
-//#include <stdlib.h>		//Extended variable and function definitions.
-//#include <string.h>		//String-based Operations Library.
 //#include <pthread.h>		//Basic thread library
 //#include <poll.h>		//Definitions for the poll() function
-//#include <sys/stat.h>		//Defines data returned by the stat() function.
-//#include <errno.h>		//Defines errno (system error value) symbol.
+
 
 
 
