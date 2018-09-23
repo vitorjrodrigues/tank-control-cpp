@@ -1,10 +1,7 @@
-#define PWM1A "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip3/pwm0/duty_cycle"
-
-#define PWM1B "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip3/pwm1/duty_cycle"
-
-#define PWM2A "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip6/pwm0/duty_cycle"
-
-#define PWM2B "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip6/pwm0/duty_cycle"
+char const *PWM1A = "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip3/pwm0/duty_cycle";
+char const *PWM1B = "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip3/pwm1/duty_cycle";
+char const *PWM2A = "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip6/pwm0/duty_cycle";
+char const *PWM2B = "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip6/pwm0/duty_cycle";
 
 struct pwm_data {
 	__u64 la;
@@ -90,7 +87,7 @@ void setupPWM() {
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 }
 
-int startPWM(char *path) {
+int startPWM(char const *path) {
 	int fd = -1;
 	
 	fd = open(path, O_RDWR);

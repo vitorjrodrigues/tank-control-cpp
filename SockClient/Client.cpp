@@ -1,5 +1,5 @@
 /*///////////////////////////////////
-/// JS Socket Client v1.9, bld 6 ///
+/// JS Socket Client v1.9, bld 8 ///
 /// Vítor Rodrigues, Student@UFPB ///
 /// ☼ 23-Sep-2018, ☾ 23-Sep-2018 ///
 ///////////////////////////////////*/
@@ -9,7 +9,7 @@
 /// 2015-2016,  RTS@DEE-UFPB      ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Socket Client v1.9.6"
+#define gmsg "Welcome to DualShock Socket Client v1.9.8"
 
 //Define IP Adress for the Server
 //#define Server_IP "127.0.0.1" //(LOCAL)
@@ -21,22 +21,28 @@
 
 #include <iostream>
 #include <fcntl.h>
-#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <asm/types.h>		//Memory-based variable types definitions.
-#include "create_socket.h"
 #include <pthread.h>		//Basic thread library
 #include <time.h>
-//#include <poll.h>		//Definitions for the poll() function
+#include <poll.h>		//Definitions for the poll() function
 
-
+#include "create_socket.h"
 #include "PWMFunc.h"
 
-struct pwm_data out;
+using namespace std;
+
+pwm_data out;
+
+int fd_value;
 
 uint64_t getTimeNanoseconds();
+
+void waitForRisingEdge();
+
+void *speedy(void *);
 
 int main() {
 
@@ -58,6 +64,11 @@ int main() {
 	//Defining variables for all struct formats
 	struct socket_client client;
 	struct input_data in;
+	
+	pthread_t lspeed=0, rspeed=0, position=0, thPWM=0;
+	pthread_create(&lspeed, 0, &speedy, 0);
+	pthread_create(&rspeed, 0, &speedy, 0);
+	
 	
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -140,6 +151,10 @@ int main() {
 		printf("\t%lli%\t\t%lli%\t\t%lli%\t\t%lli%\n", out.perla,out.perlb,out.perra,out.perrb);
 	}
 
+	// Join Threads Created
+	pthread_join(lspeed, 0);
+	pthread_join(rspeed, 0);
+	
 	// Close Output Pins
 	printf("Closing Output Pins\n");
 	endPWM(out.fd1a, out.fd1b, out.fd2a, out.fd2b);
@@ -154,8 +169,75 @@ int main() {
 
 }
 
-//uint64_t getTimeNanoseconds() {
-    //struct timespec tv;
-    //clock_gettime(CLOCK_MONOTONIC, &tv);
-    //return tv.tv_sec * 1000000000ULL + tv.tv_nsec;
-//}
+uint64_t getTimeNanoseconds() {
+    timespec tv;
+    clock_gettime(CLOCK_MONOTONIC, &tv);
+    return tv.tv_sec * 1000000000ULL + tv.tv_nsec;
+}
+
+void waitForRisingEdge() {
+    pollfd pfd[1];
+    pfd[0].fd = fd_value;
+    pfd[0].events = POLLPRI | POLLERR;
+    pfd[0].revents = 0;
+    
+    if (poll(pfd, 1, -1) < 0) {
+        exit(1);
+    }
+    lseek(fd_value, 0, SEEK_SET);
+    char dummy[16];
+    read(fd_value, dummy, 16);
+}
+
+int set_sysfs(const char *fname, string value) {
+    int fd = open(fname, O_WRONLY);
+    if (fd < 0) return fd;
+     
+    int n = write(fd, value.c_str(), value.length());
+
+    close(fd);
+    
+    return n;
+}
+
+#define FUU(deu) { cout << "FUU" << deu << endl; return 1; }
+
+void *speedy(void *) {
+    // Setup stuff
+    set_sysfs("/sys/class/gpio/export", "48");
+    set_sysfs("/sys/class/gpio/gpio48/direction", "in");
+    set_sysfs("/sys/class/gpio/gpio48/edge", "rising");
+    
+    fd_value = open("/sys/class/gpio/gpio48/value", O_RDWR);
+    if (fd_value < 0) { exit(0); }
+    
+    // Wait for a rising edge
+    waitForRisingEdge();
+    
+    // Get "old" time 
+    uint64_t old_time = getTimeNanoseconds();
+    
+    //
+    uint64_t lastUpdated = old_time;
+
+    while (true) {
+        // Wait for a rising edge
+        waitForRisingEdge();
+        
+        // Get current time 
+        uint64_t new_time = getTimeNanoseconds();
+        
+        // Compute period
+        double period = (new_time - old_time) * 1e-9;
+
+        // Update old time
+        old_time = new_time;
+        
+        // Print
+        if (new_time - lastUpdated > 1000000000) {
+            lastUpdated = new_time;
+            cout << 1/period << " mm/s" << endl;
+        }
+    }
+    
+}
