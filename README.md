@@ -53,3 +53,6 @@ $> make
 - Joystick Reader v1.9, bld 2
   - Output Variables and Socket Variables are now part of their own Structs
   
+###### 23-Set-2018 11h26
+- Joystick Reader v1.9, bld 3
+  - Key Pressing detection is now an independent function
