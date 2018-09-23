@@ -48,13 +48,8 @@ int main(int argc, char *argv[])
 	
 	//Here we define the struct format for the Tank data
 	struct tank {
-		int left;	//Left PWM Value (0 to 32767)
-		int right;	//Right PWM Value (0 to 32767)
-		int logic;  //Logic Storage Variable (based on lsign and rsign values)
-		int lsign;
-		int rsign; //Left and Right Sign Vectors (Can be 1, 0 or -1)
-		char rsignus;
-		char lsignus; //Ascii Sign Characters for Left and Right PWM ('+' or '-')
+		int left;	//Left PWM Value (-32767 to 32767)
+		int right;	//Right PWM Value (-32767 to 32767)
 		int fd; //Stores the File Descriptor value for the Joystick (His connection number)
 		ssize_t sz;
 		int output[2]; //Array to store current pwm values for both motors
