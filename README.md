@@ -22,7 +22,7 @@ or
   - 192.168.7.2 for Windows Users
   - 192.168.6.2 for Linux Users
 - Open up the Cloud9 IDE
-- Drag 'SockClient' folder to your Beaglebone's main folder
+- Drag _SockClient_ folder to your Beaglebone's main folder
 - To compile everything, type on your cloud9 terminal:
 ```
 $> cd /var/lib/cloud9/SockClient 
