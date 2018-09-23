@@ -108,3 +108,8 @@ $> ./Client
 - JS Socket Client v1.9, bld 7
   - Now in C++
   - Joystick Reader is unchanged
+
+###### 23-Set-2018 20h24
+- JS Socket Client v1.9, bld 8
+  - Velocimeter Functions Included
+  - Pthread initial resources included
