@@ -8,23 +8,25 @@
 
 //Libraries Included
 #include <stdio.h>		//Standard Library. For usage of Input/Output Buffers.
-#include <stdlib.h>		//Extended variable and function definitions.
-#include <string.h>		//String-based Operations Library.
-#include <unistd.h>		//A Basic Library for IPC Applications.
-#include <pthread.h>		//Basic thread library
-#include <poll.h>		//Definitions for the poll() function
-#include <fcntl.h>		//Defines open() function (used in pair with unistd).
-#include <sys/stat.h>		//Defines data returned by the stat() function.
-#include <errno.h>		//Defines errno (system error value) symbol.
 #include <asm/types.h>		//Memory-based variable types definitions.
-#include <math.h>		//Extension Library for Math operations
-#include <ctype.h>		//Assembly Type Definitions
+#include <unistd.h>		//A Basic Library for IPC Applications.
+#include <fcntl.h>		//Defines open() function (used in pair with unistd).
 #include <sys/socket.h>		//Socket Library
 #include "create_socket.h"	//Defines create_socket() function
+//#include <stdlib.h>		//Extended variable and function definitions.
+//#include <string.h>		//String-based Operations Library.
+//#include <pthread.h>		//Basic thread library
+//#include <poll.h>		//Definitions for the poll() function
+//#include <sys/stat.h>		//Defines data returned by the stat() function.
+//#include <errno.h>		//Defines errno (system error value) symbol.
+
+
 
 //Server IP is his own IP
-#define Server_IP "127.0.0.1" //(LOCAL)
+//#define Server_IP "127.0.0.1" //(LOCAL)
 //#define Server_IP "150.165.164.116"
+//#define Server_IP "150.165.163.228"
+#define Server_IP "192.168.1.103"
 
 //Joystick Definition for Inputs (Use only ONE at a time)
 #include "js_multilaser.h"
@@ -50,7 +52,7 @@ int main(int argc, char *argv[])
 	struct tank {
 		int left;	//Left PWM Value (-32767 to 32767)
 		int right;	//Right PWM Value (-32767 to 32767)
-		int fd; //Stores the File Descriptor value for the Joystick (His connection number)
+		int fd; 	//Stores the File Descriptor value for the Joystick
 		ssize_t sz;
 		int output[2]; //Array to store current pwm values for both motors
 	};
@@ -117,7 +119,7 @@ int main(int argc, char *argv[])
 			t.sz = read (t.fd, &e, sizeof(e));
 			
 			//If value is an Initialization Value, ignore it.
-			if(e.type<T_INITIAL) { //*************************************************************
+			if(e.type<T_INITIAL) { //************************************************
 				//If SELECT is pressed, abort the program
 				if(e.number==BTN_SELECT) {
 					printf("\nSELECT Button was pressed.\n");
@@ -152,14 +154,18 @@ int main(int argc, char *argv[])
 					printf ("\nValue = %d;\n",val);
 					printf ("Number = %x;\nType = %x\n",e.number,e.type);
 				}
-				else if (mode == 1){ //Controller Mode //*******************************************************
+				else if (mode == 1){ //Controller Mode //*****************************
 					//Ignore all inputs but LAS Y Axis and RAS Y Axis
 					if((e.type==T_STICK)&&((e.number==STK_YLEFT)||(e.number==STK_YRIGHT))) {
-						//If current value is LAS Y Axis, then Update all Left PWM Values 
+						//If value is LAS Y Axis, then Update Left PWM 
 						if(e.number==STK_YLEFT) { t.left = val; }
-						//If current value is RAS Y Axis, then Update all Right PWM Values
+						//If value is RAS Y Axis, then Update Right PWM
 						else if(e.number==STK_YRIGHT) { t.right = val; }
-
+						//If value is DPAD Y Axis, update both PWM	
+						else if(e.number==STK_YDPAD) {
+							t.left = val;
+							t.right = val;
+						}
 						//Print Current PWM Values Stored
 						printf("\n||\tLPWM\t,\tRPWM\t||");
 						printf("\n||\t%d\t,\t%d\t||\n",t.left,t.right);
