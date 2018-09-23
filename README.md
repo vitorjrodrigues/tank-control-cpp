@@ -90,3 +90,7 @@ $> ./Client
 - Joystick Reader v1.9, bld 4
   - PWM now goes from -32767 to 32767 (Previously 0 to 32767)
   - Output buffer now only contains 2 values (Logic values were discarded)
+  
+  ###### 23-Set-2018 16h42
+- Joystick Reader v1.9, bld 5
+  - Reader now sends DPAD inputs (32767, 0 and -32767)
