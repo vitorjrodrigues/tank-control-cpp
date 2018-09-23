@@ -21,4 +21,4 @@
 $>  git clone https://github.com/vitorjrodrigues/tank-control.git
 ```
 or
-- Download the directory as .zip and extract it
+- Download the directory as .zip and extract it wherever you want
