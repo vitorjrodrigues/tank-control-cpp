@@ -1,7 +1,7 @@
 /*///////////////////////////////////
-/// JS Socket Client v0.9, bld 24 ///
-/// Vítor Rodrigues, Student@UFPB ///
-/// ¤ 23-Aug-2018, ? 31-Aug-2018 ///
+/// JS Socket Client v1.9, bld 1 ///
+/// VÃ­tor Rodrigues, Student@UFPB ///
+/// Â¤ 23-Aug-2018, ? 31-Aug-2018 ///
 ///////////////////////////////////*/
 /*///////////////////////////////////
 /// Based on Inet Socket Client   ///
@@ -9,7 +9,7 @@
 /// 2015-2016,  RTS@DEE-UFPB      ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Socket Client v0.9.24"
+#define gmsg "Welcome to DualShock Socket Client v1.9.1"
 
 //Define IP Adress for the Server
 //#define Server_IP "127.0.0.1" //(LOCAL)
