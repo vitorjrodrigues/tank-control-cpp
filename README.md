@@ -1,4 +1,4 @@
-# JS Kernel Tank Control
+# JS Kernel Tank Control (C++ Version)
 
 ## Requirements
 - C++ Compiler
@@ -103,3 +103,8 @@ $> ./Client
 - JS Socket Client v1.9, bld 6
   - Now independent from logic value
   - Structs holding main variables
+  
+###### 23-Set-2018 19h36
+- JS Socket Client v1.9, bld 7
+  - Now in C++
+  - Joystick Reader is unchanged
