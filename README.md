@@ -37,7 +37,7 @@ $> cat /dev/input/js0 | hexdump −C
 ```
 - Compile everything on JS Reader. In your main computer, open a terminal:
 ```
-$> cd /tank-control-master/JSServer
+$> cd /tank-control/JSServer
 $> make
 ```
 
