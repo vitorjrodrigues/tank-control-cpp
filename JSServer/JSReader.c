@@ -68,13 +68,10 @@ int main(int argc, char *argv[])
 	struct tank t;
 	struct socket server;
 	
-	//Intermediate Variables
-	int hold1=0, hold2=0; //Temp Boolean Values for key combinations
-	int mode=500;	//Temp Boolean Value for operation mode
-
-	//Current Value Variables
-	int sign=0;	//Stores Sign Vector for the current event (Can be 1, 0 or -1)
-	int val=0;	//Stores Absolute Value for the current event
+	//Intermediary Variables
+	int hold1=0, hold2=0;	//Temp Boolean Values for key combinations
+	int mode=500;		//Temp Boolean Value for operation mode
+	int val=0;		//Stores Absolute Value for the current event
 	
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
