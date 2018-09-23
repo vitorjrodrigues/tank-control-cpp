@@ -98,3 +98,8 @@ $> ./Client
 ###### 23-Set-2018 17h00
 - JS Socket Client v1.9, bld 3
   - Client compatible with new PWM value (-32767 to 32767)
+  
+  ###### 23-Set-2018 18h23
+- JS Socket Client v1.9, bld 6
+  - Now independent from logic value
+  - Structs holding main variables
