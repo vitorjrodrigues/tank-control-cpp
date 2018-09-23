@@ -5,6 +5,7 @@
 - Joystick with two Analog Sticks and at least 3 buttons
   - Preferrably DualShock or similar
 - BeagleBone Black
+- Also an USB Adapter for your Joystick if it uses another standard interface
 
 ## Change log
 
@@ -37,3 +38,13 @@ $> make
 ```
 
 #### Step 3 - Configuring Joystick
+- Connect your Joystick
+- Check if its functioning properly:
+```
+$> cat /dev/input/js0 | hexdump −C
+```
+- Compile everything on JS Reader. In your main computer, open a terminal:
+```
+$> cd /tank-control-master/JSServer
+$> make
+```
