@@ -1,10 +1,10 @@
 /*///////////////////////////////////
-/// Joystick Reader v1.9, bld 4  ///
+/// Joystick Reader v1.9, bld 5  ///
 /// Vítor Rodrigues, Student@UFPB ///
 /// ☼ 22-Sep-2018, ☾ 23-Sep-2018 ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Joystick Reader v1.9.4"
+#define gmsg "Welcome to DualShock Joystick Reader v1.9.5"
 
 //Libraries Included
 #include <stdio.h>		//Standard Library. For usage of Input/Output Buffers.
@@ -13,16 +13,11 @@
 #include <fcntl.h>		//Defines open() function (used in pair with unistd).
 #include <sys/socket.h>		//Socket Library
 #include "create_socket.h"	//Defines create_socket() function
-//#include <pthread.h>		//Basic thread library
-//#include <poll.h>		//Definitions for the poll() function
-
-
 
 
 //Server IP is his own IP
 //#define Server_IP "127.0.0.1" //(LOCAL)
 //#define Server_IP "150.165.164.116"
-//#define Server_IP "150.165.163.228"
 #define Server_IP "192.168.1.103"
 
 //Joystick Definition for Inputs (Use only ONE at a time)
@@ -111,6 +106,11 @@ int main(int argc, char *argv[])
 		
 		// Client message loop:
 		while (1) { //If all goes well, the program should start HERE
+			//Check if client is responsive
+			if(server.sent == -1) {
+				printf("Client %d is lost!\n",server.label);
+				break;
+			}			
 			
 			//read a value from the event
 			t.sz = read (t.fd, &e, sizeof(e));
@@ -173,11 +173,6 @@ int main(int argc, char *argv[])
 					
 					//Now Transmit the values through the Socket
 					server.sent = write(server.client,  t.output , sizeof(t.output));
-					
-					if(server.sent == -1) {
-						printf("Client %d is lost!\n",server.label);
-						break;
-					}
 				}	
 			}
 		}
