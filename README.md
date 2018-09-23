@@ -64,7 +64,7 @@ $> ./Client
 - Follow the instructions until the client connects.
 - Server will tell whenever it's ready to start transmitting
 
-### Step 6 - Sending Commands
+#### Step 6 - Sending Commands
 - With your Joystick in hands, enter _Controller Mode_
 - Use Left and Right Analog Sticks to control the tank
   - Sticks can only send up and down values, meaning forwards and backwards to their respective motors
