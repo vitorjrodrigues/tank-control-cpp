@@ -1,10 +1,10 @@
 /*///////////////////////////////////
-/// Joystick Reader v1.9, bld 2  ///
+/// Joystick Reader v1.9, bld 3  ///
 /// Vítor Rodrigues, Student@UFPB ///
 /// ☼ 22-Sep-2018, ☾ 22-Sep-2018 ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Joystick Reader v1.9.1"
+#define gmsg "Welcome to DualShock Joystick Reader v1.9.3"
 
 //Libraries Included
 #include <stdio.h>		//Standard Library. For usage of Input/Output Buffers.
@@ -23,8 +23,8 @@
 #include "create_socket.h"	//Defines create_socket() function
 
 //Server IP is his own IP
-//#define Server_IP "127.0.0.1" //(LOCAL)
-#define Server_IP "150.165.164.116"
+#define Server_IP "127.0.0.1" //(LOCAL)
+//#define Server_IP "150.165.164.116"
 
 //Joystick Definition for Inputs (Use only ONE at a time)
 #include "js_multilaser.h"
@@ -35,6 +35,9 @@ int makeLogic(int leftInput, int rightInput);
 
 //Closes Socket and Joystick
 void bigClosure ( int fdJS, int fdSock);
+
+//Detect Key Pressing
+void pressKey (char K);
 
 int main(int argc, char *argv[])
 {
@@ -80,7 +83,6 @@ int main(int argc, char *argv[])
 	//Intermediate Variables
 	int hold1=0, hold2=0; //Temp Boolean Values for key combinations
 	int mode=500;	//Temp Boolean Value for operation mode
-	char key = 0; //Temp Variable just for reading Key pressing
 
 	//Current Value Variables
 	int sign=0;	//Stores Sign Vector for the current event (Can be 1, 0 or -1)
@@ -92,12 +94,10 @@ int main(int argc, char *argv[])
 	printf("%s!\n",gmsg);
 
 	//Wait until Enter Key is pressed
-	printf("Press Enter to connect with your Device...");
-	while (key != '\r' && key != '\n') { key = getchar(); }
-	key = 0;
+	pressKey('\r');
 
 	//Open Joystick Port, Read-Only Mode
-	printf("Connecting with your device...");
+	printf("Connecting with your device... ");
 	tank.fd = open ("/dev/input/js0", O_RDONLY);
 	
 	//Return Value of open() function shows if the connection has succeeded
@@ -110,9 +110,7 @@ int main(int argc, char *argv[])
 	else { printf("Connection Successful!! :)\n"); }
 	
 	//Wait until Enter Key is pressed
-	printf("Press Enter to connect with the Socket Client...");
-	while (key != '\r' && key != '\n') { key = getchar(); }
-	key = 0;
+	pressKey('\r');
 	
 	// Creates a server socket and terminate on error
 	server.status = create_socket(1, Server_IP);
@@ -220,11 +218,7 @@ int main(int argc, char *argv[])
 		close(server.client);
 		
 		//If no client is connected, ask if the user want to end the server
-		printf("There are no more clients left, do you wish to exit server? (y/n) ");
-		while (key != 'y' && key != 'n' && key!= 'Y' && key!= 'N') { key = getchar(); }
-		if (key =='Y' || key == 'y')		{ break; }
-		else if (key == 'n' || key == 'N')	{ printf("OK. The Server will remain open.\n"); }
-		key = 0;
+		pressKey('x');
 	}
 	
 	//Close Socket and then close Joystick Port
@@ -272,4 +266,22 @@ void bigClosure ( int fdJS, int fdSock) {
 	printf("Closing Joystick Port...");
 	close(fdJS);
 	printf("DONE\n");
+}
+
+void pressKey (char K) {
+	char key = 0;
+	if (K == '\r') {
+		printf("Press Enter to connect with the Socket Client...");
+		while (key != K && key != '\n') { key = getchar(); } 
+	}
+	else if (K == 'x') {
+		printf("There are no more clients left, do you wish to exit server? (y/n) ");
+		while (key != 'y' && key != 'n' && key!= 'Y' && key!= 'N') { key = getchar(); }
+		if (key =='Y' || key == 'y')		{ exit(0); }
+		else if (key == 'n' || key == 'N')	{ printf("OK. The Server will remain open.\n"); }
+	}
+	else {
+		printf("Press %c to continue...",K);
+		while (key != K) { key = getchar(); } 
+	}
 }
