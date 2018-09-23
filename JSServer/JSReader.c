@@ -1,10 +1,10 @@
 /*///////////////////////////////////
-/// Joystick Reader v2.0, bld 1  ///
+/// Joystick Reader v1.9, bld 1  ///
 /// Vítor Rodrigues, Student@UFPB ///
 /// ☼ 22-Sep-2018, ☾ 22-Sep-2018 ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Joystick Reader v2.0.1"
+#define gmsg "Welcome to DualShock Joystick Reader v1.9.1"
 
 //Libraries Included
 #include <stdio.h>		//Standard Library. For usage of Input/Output Buffers.
