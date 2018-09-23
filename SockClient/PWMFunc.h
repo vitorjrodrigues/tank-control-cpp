@@ -6,18 +6,33 @@
 
 #define PWM2B "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip6/pwm0/duty_cycle"
 
+struct pwm_data {
+	__u64 la;
+	__u64 lb;
+	__u64 ra;
+	__u64 rb;
+	int fd1a;
+	int fd1b;
+	int fd2a;
+	int fd2b;
+	__u64 perla;
+	__u64 perlb;
+	__u64 perra;
+	__u64 perrb;
+};
+
 
 void setValue(const char *path, const void *data) {
-	char buf1[4], buf2[4];
+	char bf1[4], bf2[4];
 	int fildes = open(path, O_RDWR);
 	if (fildes == -1) {
     	printf("Failed opening.\n");
     	exit(0);
 	}
-	read(fildes, buf1, sizeof(buf1));
+	read(fildes, bf1, sizeof(bf1));
 	write(fildes,  data , sizeof(data));
-	read(fildes, buf2, sizeof(buf2));
-	if (buf1 != (buf2+4)) {
+	read(fildes, bf2, sizeof(bf2));
+	if (bf1 != (bf2+4)) {
 	    printf("Failed writing.\n");
 	    exit(0);
 	}
