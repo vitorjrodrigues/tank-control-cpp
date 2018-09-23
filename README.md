@@ -16,9 +16,12 @@
 
 ## How to Install
 
+#### Step 1
 - Clone the repository via terminal:
 ```
 $>  git clone https://github.com/vitorjrodrigues/tank-control.git
 ```
 or
 - Download the directory as .zip and extract it wherever
+
+#### Step 2
