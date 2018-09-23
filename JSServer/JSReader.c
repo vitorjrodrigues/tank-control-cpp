@@ -42,8 +42,6 @@ int makeLogic(int leftInput, int rightInput);
 //Closes Socket and Joystick
 void bigClosure ( int fdJS, int fdSock);
 
-char s[]=""; //Temporary string just to print names on screen
-
 int main(int argc, char *argv[])
 {
 	//Here we define the struct format for the JS input event
@@ -71,11 +69,16 @@ int main(int argc, char *argv[])
 	//Here we create the variable tank with the js_data format
 	struct js_data tank;
 
-	//Socket Variables
-	int server = -1;
-	int client = -1;
-	int sent = -1;
-	int label = 0;
+	//Here we define the struct format for the Socket Server
+	struct socket {
+		int server = -1;
+		int client = -1;
+		int sent = -1;
+		int label = 0;
+	};
+
+	//Here we create the variable tank with the js_data format
+	struct socket serv;
 	
 	//Joystick Variables
 	int fd=0; //Stores the File Descriptor value for the Joystick (His connection number)
