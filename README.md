@@ -41,6 +41,15 @@ $> cd /tank-control/JSServer
 $> make
 ```
 
+#### Step 4 - Configuring Tank
+- Find your L+, L-, R+ and R- motor pins
+- Connect these pins on their respective Beaglebone Black pins
+  - L+ on P9_14
+  - L- on P9_16
+  - R+ on P8_19
+  - R- on P8_13 
+- Connect your Beaglebone Black to your network source (Cable or Antenna)
+- Connect your power supply (not needed if connected on USB cable)
 ## Change log
 
 ###### 23-Set-2018 09h42
