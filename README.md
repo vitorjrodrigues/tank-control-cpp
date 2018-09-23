@@ -1,5 +1,12 @@
 # JS Kernel Tank Control
 
+## Requirements
+- C++ Compiler
+- Joystick with two Analog Sticks and at least 3 buttons
+  - Preferrably DualShock or similar
+- BeagleBone Black
+
+
 ## Change log
 
 ###### 23-Set-2018 09h42
