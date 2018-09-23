@@ -1,7 +1,7 @@
 /*///////////////////////////////////
-/// JS Socket Client v1.9, bld 1 ///
+/// JS Socket Client v1.9, bld 3 ///
 /// Vítor Rodrigues, Student@UFPB ///
-/// ¤ 23-Aug-2018, ? 31-Aug-2018 ///
+/// ☼ 23-Sep-2018, ☾ 23-Sep-2018 ///
 ///////////////////////////////////*/
 /*///////////////////////////////////
 /// Based on Inet Socket Client   ///
@@ -9,15 +9,15 @@
 /// 2015-2016,  RTS@DEE-UFPB      ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Socket Client v1.9.1"
+#define gmsg "Welcome to DualShock Socket Client v0.9.24"
 
 //Define IP Adress for the Server
 //#define Server_IP "127.0.0.1" //(LOCAL)
-#define Server_IP "150.165.164.116"
+//#define Server_IP "150.165.164.116"
+#define Server_IP "192.168.1.103"
 
 #define Period	10000000ul
-#define sPeriod "10000000"
-#define PDIV	129
+#define PWMMax	32767;
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -25,7 +25,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <sys/types.h>
 #include <stdint.h>
 #include <math.h>
@@ -37,7 +36,6 @@ int main() {
 
 	//Intermediate Variables
 	char key = 0;
-	int PWMMax = 32767/PDIV;
 
 	//Socket Variables
 	int sock = -1;
@@ -66,10 +64,10 @@ int main() {
 	
 	//Starting PWM
 	printf("--Initializing PWM Pins... ");
-	fd1a = startPWM("/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip3/pwm0/duty_cycle");
-	fd1b = startPWM("/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip3/pwm1/duty_cycle");
-	fd2a = startPWM("/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip6/pwm0/duty_cycle");
-	fd2b = startPWM("/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip6/pwm0/duty_cycle");
+	fd1a = startPWM(PWM1A);
+	fd1b = startPWM(PWM1B);
+	fd2a = startPWM(PWM2A);
+	fd2b = startPWM(PWM2B);
 	printf("DONE\n");
 	
 	//Configuration is Complete
