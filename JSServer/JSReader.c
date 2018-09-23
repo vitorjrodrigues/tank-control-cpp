@@ -210,7 +210,7 @@ void closure ( int fdJS, int fdSock) {
 void pressKey (char K) {
 	char key = 0;
 	if (K == '\r') {
-		printf("Press Enter to connect with the Socket Client...");
+		printf("Press Enter to continue...");
 		while (key != K && key != '\n') { key = getchar(); } 
 	}
 	else {
