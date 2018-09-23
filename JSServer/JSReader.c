@@ -65,8 +65,8 @@ int main(int argc, char *argv[])
 
 	//Here we create variables for all struct formats
 	struct js_event e;
-	struct tank t;
-	struct socket server;
+	struct tank 	t;
+	struct socket 	server;
 	
 	//Intermediary Variables
 	int hold1=0, hold2=0;	//Temp Boolean Values for key combinations
@@ -87,11 +87,9 @@ int main(int argc, char *argv[])
 	
 	//Return Value of open() function shows if the connection has succeeded
 	if(t.fd<0) { //**************************************************************
-		//Connection Failed. Report it on a Status Message
 		printf("Connection Failed!! :(\nPlease try again.\n");
 		return 1;
 	}
-	//Connection Succeeded. Report Status to User
 	else { printf("Connection Successful!! :)\n"); }
 	
 	//Wait until Enter Key is pressed
@@ -120,13 +118,13 @@ int main(int argc, char *argv[])
 			
 			//If value is an Initialization Value, ignore it.
 			if(e.type<T_INITIAL) { //*************************************************************
-				//If SELECT is pressed, then abort the program
+				//If SELECT is pressed, abort the program
 				if(e.number==BTN_SELECT) {
 					printf("\nSELECT Button was pressed.\n");
 					break;
 				}
 
-				//Check if input is either Axis or Button and properly stores current value
+				//Check if input is either Axis or Button and stores current value
 				if(e.type==T_BUTTON) { //Button values are unsigned booleans
 					val = e.value;
 				}
@@ -135,10 +133,10 @@ int main(int argc, char *argv[])
 				}		
 				
 				//Detects if R1+△ was pressed
-				if(e.type==T_BUTTON&&e.number==BTN_R1)			{ hold1=!hold1; }
+				if(e.type==T_BUTTON&&e.number==BTN_R1)		{ hold1=!hold1; }
 				if(e.type==T_BUTTON&&e.number==BTN_TRIANGLE)	{ hold2=!hold2; }
 
-				//If it was pressed, then do this
+				//If it was pressed, do this
 				if(hold1!=0&&hold2!=0) {
 					if(mode>1) { mode = 0; }
 					mode = !mode;	//Change the operation mode
@@ -200,7 +198,7 @@ void closure ( int fdJS, int fdSock) {
 	unlink(Server_IP);
 	printf("DONE\n");
 	
-	//Close the Port in which the joystick was opened
+	//Close the port used by the Joystick 
 	printf("Closing Joystick Port...");
 	close(fdJS);
 	printf("DONE\n");
