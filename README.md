@@ -67,7 +67,11 @@ $> make
 $> ./JSReader
 ```
 - Follow the instructions on the screen until the server connects
-- After the server is on, go to your Beaglebone's Cloud9 Terminal and execute the client:
+- After the server is on, go to your Beaglebone's Cloud9 Terminal and enter Superuser mode by inserting:
+```
+$> sudo su
+```
+- To confirm, type your device's password (which is _temppwd_ by default). Then, execute the client:
 ```
 $> ./Client
 ```
