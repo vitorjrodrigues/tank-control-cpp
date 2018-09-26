@@ -1,9 +1,16 @@
-BIN = Client
+all: Client
 
-Client: Client.o create_socket_inet.o
-	cc -c -o create_socket_inet.o create_socket_inet.cpp
-	cc -c -o Client.o Client.cpp
-	g++ -o Client Client.o create_socket_inet.o -lpthread -lm
+Client: Client.o Setup.o create_socket_inet.o
+	g++ -o Client Client.o Setup.o create_socket_inet.o -lpthread -lm
 
+Client.o: Client.cpp create_socket.h
+	g++ -o Client.o -c Client.cpp
+	
+Setup.o: Setup.cpp Setup.h
+	g++ -o Setup.o -c Setup.cpp
+
+create_socket_inet.o: create_socket_inet.cpp create_socket.h
+	c++ -o create_socket_inet.o -c create_socket_inet.cpp
+	
 clean:
-	rm -f *.o $(BIN)
+	rm -f *.o Client

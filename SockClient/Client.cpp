@@ -1,7 +1,7 @@
 /*///////////////////////////////////
-/// JS Socket Client v1.9, bld 8 ///
+/// JS Socket Client v1.9, bld 10 ///
 /// Vítor Rodrigues, Student@UFPB ///
-/// ☼ 23-Sep-2018, ☾ 23-Sep-2018 ///
+/// ☼ 23-Sep-2018, ☾ 25-Sep-2018  ///
 ///////////////////////////////////*/
 /*///////////////////////////////////
 /// Based on Inet Socket Client   ///
@@ -9,81 +9,52 @@
 /// 2015-2016,  RTS@DEE-UFPB      ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Socket Client v1.9.8"
+#define gmsg "Welcome to DualShock Socket Client v1.9.10"
 
 //Define IP Adress for the Server
-//#define Server_IP "127.0.0.1" //(LOCAL)
+#define Server_IP "127.0.0.1" //(LOCAL)
 //#define Server_IP "150.165.164.116"
-#define Server_IP "192.168.1.103"
+//#define Server_IP "192.168.1.103"
 
 #define Period	10000000ull
 #define PWMMax	32767;
 
 #include <iostream>
-#include <fcntl.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <asm/types.h>		//Memory-based variable types definitions.
 #include <pthread.h>		//Basic thread library
 #include <time.h>
 #include <poll.h>		//Definitions for the poll() function
 
 #include "create_socket.h"
-#include "PWMFunc.h"
+#include "sysfsHelper.h"
+#include "Setup.h"
 
 using namespace std;
 
+//Defining variables for all struct formats
 pwm_data out;
-
-int fd_value;
-
-uint64_t getTimeNanoseconds();
-
-void waitForRisingEdge();
-
-void *speedy(void *);
+socket_client client;
+input_data in;
 
 int main() {
-
-	//Defining Socket Client Struct
-	struct socket_client {
-		int sock;
-		ssize_t sz;
-	};
-
-	//Defining Input Data Struct
-	struct input_data {
-		int put[2];
-		int LIA;
-		int LIB;
-		int RIA;
-		int RIB;
-	};
-
-	//Defining variables for all struct formats
-	struct socket_client client;
-	struct input_data in;
-	
-	pthread_t lspeed=0, rspeed=0, position=0, thPWM=0;
-	pthread_create(&lspeed, 0, &speedy, 0);
-	pthread_create(&rspeed, 0, &speedy, 0);
-	
-	
-	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 	//Greeting Message
 	printf("%s!\n",gmsg);
 
-	//Configuring PWM
-	setupPWM();
+	//Setups
+	setupPWM(Period);
+	setupSPD();
 	
 	//Starting PWM
 	printf("--Initializing PWM Pins... ");
-	out.fd1a = startPWM(PWM1A);
-	out.fd1b = startPWM(PWM1B);
-	out.fd2a = startPWM(PWM2A);
-	out.fd2b = startPWM(PWM2B);
+	for (int i = 0; i < 2; i++) {
+		char b[128];
+		snprintf(b, 128, "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip3/pwm%d/duty_cycle",i);
+		out.fd1[i] = startValue(b);
+		snprintf(b, 128, "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip6/pwm%d/duty_cycle",i);
+		out.fd2[i] = startValue(b);
+	}
 	printf("DONE\n");
 	
 	//Configuration is Complete
@@ -107,8 +78,8 @@ int main() {
 			return 1;
 		}
 		else if (client.sz == 0) {
-			printf("Server Lost!\nTERMINATING");
-			return 1;
+			printf("Server Lost!\n");
+			break;
 		}
 		
 		if(in.put[0]>=0) {
@@ -129,35 +100,34 @@ int main() {
 			in.RIB = (-1)*in.put[1];
 		}
 		
+		///Print back the received values (for debug only).
+		//printf("\t%d\t|\t%d\t|\t%d\t|\t%d\n", in.LIA,in.LIB,in.RIA,in.RIB);
+		
 		//Here we get duty cycle as a function of Period
 		out.la = (in.LIA*Period)/PWMMax;
 		out.lb = (in.LIB*Period)/PWMMax;
 		out.ra = (in.RIA*Period)/PWMMax;
 		out.rb = (in.RIB*Period)/PWMMax;
 		
-		//And their percentual value
-		out.perla = out.la*100/Period;
-		out.perlb = out.lb*100/Period;
-		out.perra = out.ra*100/Period;
-		out.perrb = out.rb*100/Period;
-
-		///Print back the received message.
-		//printf("\t%d\t|\t%d\t|\t%d\t|\t%d\n", in.LIA,in.LIB,in.RIA,in.RIB);
+		//And their relative period reference values
+		double lperiod = (double)out.la - (double)out.lb;
+		double rperiod = (double)out.ra - (double)out.rb;
+		
+		//Which are used to calculate reference speed values
+		out.lspeed = 1/lperiod;
+		out.rspeed = 1/rperiod;
 
 		//Update the PWM Duty Cycle on the four Output pins
-		updatePWM(out.la,out.lb,out.ra,out.rb,out.fd1a,out.fd1b,out.fd2a,out.fd2b);
+		updatePWM(out.la,out.lb,out.ra,out.rb,out.fd1,out.fd2);
 
-		// Print back the received message.
-		printf("\t%lli%\t\t%lli%\t\t%lli%\t\t%lli%\n", out.perla,out.perlb,out.perra,out.perrb);
+		// Print back the received speeds.
+		printf("|\t\tLeft\t\t|\t\tRight\t\t|\n");
+		printf("|\t\t%lf mm/s\t\t|\t\t%lf mm/s\t\t|", out.lspeed, out.rspeed);
 	}
-
-	// Join Threads Created
-	pthread_join(lspeed, 0);
-	pthread_join(rspeed, 0);
 	
 	// Close Output Pins
 	printf("Closing Output Pins\n");
-	endPWM(out.fd1a, out.fd1b, out.fd2a, out.fd2b);
+	endPWM(out.fd1, out.fd2);
 	
 	// Close the Socket and remove it.
 	printf("Closing Socket\n");
@@ -167,77 +137,4 @@ int main() {
 	printf("Program Terminated.\n");
 	return 0;
 
-}
-
-uint64_t getTimeNanoseconds() {
-    timespec tv;
-    clock_gettime(CLOCK_MONOTONIC, &tv);
-    return tv.tv_sec * 1000000000ULL + tv.tv_nsec;
-}
-
-void waitForRisingEdge() {
-    pollfd pfd[1];
-    pfd[0].fd = fd_value;
-    pfd[0].events = POLLPRI | POLLERR;
-    pfd[0].revents = 0;
-    
-    if (poll(pfd, 1, -1) < 0) {
-        exit(1);
-    }
-    lseek(fd_value, 0, SEEK_SET);
-    char dummy[16];
-    read(fd_value, dummy, 16);
-}
-
-int set_sysfs(const char *fname, string value) {
-    int fd = open(fname, O_WRONLY);
-    if (fd < 0) return fd;
-     
-    int n = write(fd, value.c_str(), value.length());
-
-    close(fd);
-    
-    return n;
-}
-
-#define FUU(deu) { cout << "FUU" << deu << endl; return 1; }
-
-void *speedy(void *) {
-    // Setup stuff
-    set_sysfs("/sys/class/gpio/export", "48");
-    set_sysfs("/sys/class/gpio/gpio48/direction", "in");
-    set_sysfs("/sys/class/gpio/gpio48/edge", "rising");
-    
-    fd_value = open("/sys/class/gpio/gpio48/value", O_RDWR);
-    if (fd_value < 0) { exit(0); }
-    
-    // Wait for a rising edge
-    waitForRisingEdge();
-    
-    // Get "old" time 
-    uint64_t old_time = getTimeNanoseconds();
-    
-    //
-    uint64_t lastUpdated = old_time;
-
-    while (true) {
-        // Wait for a rising edge
-        waitForRisingEdge();
-        
-        // Get current time 
-        uint64_t new_time = getTimeNanoseconds();
-        
-        // Compute period
-        double period = (new_time - old_time) * 1e-9;
-
-        // Update old time
-        old_time = new_time;
-        
-        // Print
-        if (new_time - lastUpdated > 1000000000) {
-            lastUpdated = new_time;
-            cout << 1/period << " mm/s" << endl;
-        }
-    }
-    
 }
