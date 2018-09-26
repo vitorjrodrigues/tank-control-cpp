@@ -132,3 +132,7 @@ $> ./Client
 - JS Socket Client v1.9, bld 10
   - Newly organized and more modular code
   - Speed and Position Sensors were removed temporarily
+  
+###### 23-Set-2018 22h44
+- JS Socket Client v1.9, bld 11
+  - Speed and Position Sensors reimplemented, now working properly
