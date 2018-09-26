@@ -39,16 +39,6 @@ void setupPWM(unsigned long long perd) {
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 }
 
-void setupSPD() {
-	setValue("/sys/class/gpio/export", "48");
-    setValue("/sys/class/gpio/gpio48/direction", "in");
-    setValue("/sys/class/gpio/gpio48/edge", "rising");
-	setValue("/sys/class/gpio/export", "49");
-    setValue("/sys/class/gpio/gpio49/direction", "in");
-    setValue("/sys/class/gpio/gpio49/edge", "rising");
-}
-
-
 int startValue(char const *path) {
 	int fd = -1;
 	fd = open(path, O_RDWR);

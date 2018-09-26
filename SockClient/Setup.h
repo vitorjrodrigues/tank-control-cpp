@@ -20,10 +20,11 @@ struct pwm_data {
 	int fd2[2];
 	double lspeed;
 	double rspeed;
+	double cmd_l;
+	double cmd_r;
 };
 
 void setupPWM(unsigned long long period);
-void setupSPD();
 int startValue(char const *path);
 void updatePWM(int la, int lb, int ra, int rb, int fd1[], int fd2[]);
 void endPWM(int fd1[], int fd2[]);
