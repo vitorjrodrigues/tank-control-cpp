@@ -17,27 +17,33 @@ $>  git clone https://github.com/vitorjrodrigues/tank-control.git
 or
 - Download the directory as .zip and extract it wherever
 
-#### Step 2 - Configuring Client
-- Open your Beaglebone via Browser:
-  - 192.168.7.2 for Windows Users
-  - 192.168.6.2 for Linux Users
-- Open up the Cloud9 IDE
-- Drag _SockClient_ folder to your Beaglebone's main folder
-- To compile everything, type on your cloud9 terminal:
-```
-$> cd /var/lib/cloud9/SockClient 
-$> make
-```
-
-#### Step 3 - Configuring Joystick
+#### Step 2 - Configuring Joystick
 - Connect your Joystick
 - Check if its functioning properly:
 ```
 $> cat /dev/input/js0 | hexdump −C
 ```
-- Compile everything on JS Reader. In your main computer, open a terminal:
+- Copy your main computer IP address. You can do that by opening a terminal and typing (Highlight and type Ctrl+Ins to copy):
+```
+$> curl ipinfo.io/ip
+```
+- Open your main file (_JSReader.c_) and replace with that IP address whichever value is defined for _Server_IP_ (must be between double quotes)
+- To compile everything on JS Reader, in your main computer, open a terminal:
 ```
 $> cd /tank-control/JSServer
+$> make
+```
+
+#### Step 3 - Configuring Client
+- Open your Beaglebone via Browser:
+  - 192.168.7.2 for Windows Users
+  - 192.168.6.2 for Linux Users
+- Open up the Cloud9 IDE
+- Drag _SockClient_ folder to your Beaglebone's main folder
+- Open the main file (_Client.cpp_) and replace the _Server_IP_ value with the SAME IP Address placed on _JSReader.c_
+- Compile everything, by typing on your cloud9 terminal:
+```
+$> cd /var/lib/cloud9/SockClient 
 $> make
 ```
 
@@ -48,6 +54,10 @@ $> make
   - L- on P9_16
   - R+ on P8_19
   - R- on P8_13 
+- Find your LSPEED and RSPEED motor feedback pins
+- Connect these on their respective Beaglebone Black pins
+  - LSPEED on P9_15
+  - RSPEED on P9_12
 - Connect your Beaglebone Black to your network source (Cable or Antenna)
 - Connect your power supply (not needed if connected on USB cable)
 
