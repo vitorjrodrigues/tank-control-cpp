@@ -3,15 +3,7 @@
 
 #include <asm/types.h>
 
-struct input_data {
-	int put[2];
-	int LIA;
-	int LIB;
-	int RIA;
-	int RIB;
-};
-
-struct pwm_data {
+struct pwm_data_t {
 	__u64 la;
 	__u64 lb;
 	__u64 ra;
