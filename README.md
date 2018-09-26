@@ -113,3 +113,8 @@ $> ./Client
 - JS Socket Client v1.9, bld 8
   - Velocimeter Functions Included
   - Pthread initial resources included
+  
+###### 23-Set-2018 20h27
+- JS Socket Client v1.9, bld 10
+  - Newly organized and more modular code
+  - Speed and Position Sensors were removed temporarily
