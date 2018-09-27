@@ -12,7 +12,7 @@
 #### Step 1 - Downloading
 - Clone the repository via terminal:
 ```
-$>  git clone https://github.com/vitorjrodrigues/tank-control.git
+$>  git clone https://github.com/vitorjrodrigues/tank-control-cpp.git
 ```
 or
 - Download the directory as .zip and extract it wherever
