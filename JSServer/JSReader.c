@@ -1,10 +1,10 @@
 /*///////////////////////////////////
-/// Joystick Reader v1.9, bld 5  ///
+/// Joystick Reader v1.9, bld 6  ///
 /// Vítor Rodrigues, Student@UFPB ///
 /// ☼ 22-Sep-2018, ☾ 23-Sep-2018 ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Joystick Reader v1.9.5"
+#define gmsg "Welcome to DualShock Joystick Reader v1.9.6"
 
 //Libraries Included
 #include <stdio.h>		//Standard Library. For usage of Input/Output Buffers.
@@ -12,13 +12,15 @@
 #include <unistd.h>		//A Basic Library for IPC Applications.
 #include <fcntl.h>		//Defines open() function (used in pair with unistd).
 #include <sys/socket.h>		//Socket Library
+#include <netinet/in.h>     //INET Library
+#include <netinet/tcp.h>
 #include "create_socket.h"	//Defines create_socket() function
 
 
 //Server IP is his own IP
 //#define Server_IP "127.0.0.1" //(LOCAL)
-//#define Server_IP "150.165.164.116"
 #define Server_IP "192.168.1.103"
+//#define Server_IP "150.165.164.199"
 
 //Joystick Definition for Inputs (Use only ONE at a time)
 #include "js_multilaser.h"
@@ -29,6 +31,9 @@ void closure ( int fdJS, int fdSock);
 
 //Detect Key Pressing
 void pressKey (char K);
+
+//Disable Buffering from Socket
+int disableNag(int sock);
 
 int main(int argc, char *argv[])
 {
@@ -92,6 +97,13 @@ int main(int argc, char *argv[])
 	// Creates a server socket and terminate on error
 	server.status = create_socket(1, Server_IP);
 	if (server.status == -1) { return 1; }
+	
+	// Disable Nagle
+    int res = disableNag(server.status);
+     if (res < 0) {
+        printf("Nagle could not be disabled\n");
+        return 1;
+     }
 		
 	// Listener loop
 	while (1) {
@@ -212,4 +224,14 @@ void pressKey (char K) {
 		printf("Press %c to continue...",K);
 		while (key != K) { key = getchar(); } 
 	}
+}
+
+int disableNag(int sock) {
+    int flag = 1;
+    int result = setsockopt(sock,            /* socket affected */
+                            IPPROTO_TCP,     /* set option at TCP level */
+                            TCP_NODELAY,     /* name of option */
+                            (char *) &flag,  /* the cast is historical cruft */
+                            sizeof(int));    /* length of option value */
+    return result;
 }
