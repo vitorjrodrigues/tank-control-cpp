@@ -136,3 +136,7 @@ $> ./Client
 ###### 23-Set-2018 22h44
 - JS Socket Client v1.9, bld 11
   - Speed and Position Sensors reimplemented, now working properly
+
+###### 28-Set-2018 11h54
+- Joystick Reader v1.9, bld 6
+  - Now with _TCP_NODELAY_ implemented for better real time response
