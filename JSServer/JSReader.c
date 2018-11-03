@@ -1,10 +1,10 @@
 /*///////////////////////////////////
-/// Joystick Reader v1.9, bld 6  ///
+/// Joystick Reader v1.9, bld 7  ///
 /// Vítor Rodrigues, Student@UFPB ///
 /// ☼ 22-Sep-2018, ☾ 23-Sep-2018 ///
 ///////////////////////////////////*/
 
-#define gmsg "Welcome to DualShock Joystick Reader v1.9.6"
+#define gmsg "Welcome to DualShock Joystick Reader v1.9.7"
 
 //Libraries Included
 #include <stdio.h>		//Standard Library. For usage of Input/Output Buffers.
@@ -17,10 +17,8 @@
 #include "create_socket.h"	//Defines create_socket() function
 
 
-//Server IP is his own IP
-//#define Server_IP "127.0.0.1" //(LOCAL)
-#define Server_IP "192.168.1.103"
-//#define Server_IP "150.165.164.199"
+//Server IP on Server checks for all Client's IPs
+#define Server_IP "0.0.0.0"
 
 //Joystick Definition for Inputs (Use only ONE at a time)
 #include "js_multilaser.h"
