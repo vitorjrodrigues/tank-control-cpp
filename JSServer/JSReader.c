@@ -1,7 +1,7 @@
 /*///////////////////////////////////
 /// Joystick Reader v1.9, bld 7  ///
 /// Vítor Rodrigues, Student@UFPB ///
-/// ☼ 22-Sep-2018, ☾ 23-Sep-2018 ///
+/// ☼ 22-Sep-2018, ☾ 29-Oct-2018 ///
 ///////////////////////////////////*/
 
 #define gmsg "Welcome to DualShock Joystick Reader v1.9.7"
