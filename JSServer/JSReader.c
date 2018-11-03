@@ -75,9 +75,6 @@ int main(int argc, char *argv[])
 	//Greeting Message
 	printf("%s!\n",gmsg);
 
-	//Wait until Enter Key is pressed
-	pressKey('\r');
-
 	//Open Joystick Port, Read-Only Mode
 	printf("Connecting with your device... ");
 	t.fd = open ("/dev/input/js0", O_RDONLY);
